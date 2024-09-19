@@ -3,6 +3,11 @@ from event.models import (
     Event,
     EventAttendee
 )
+from middleware.validator import ValidateSchema
+from event.schema import (
+    CreateEventSchema,
+    RegisterAttendeeSchema,
+)
 from rest_framework.response import Response
 
 
@@ -10,6 +15,7 @@ class CreateEvent(APIView):
     def __init__(self):
         ...
 
+    @ValidateSchema(CreateEventSchema)
     def post(self, request):
         response = Response()
         event = None
@@ -18,7 +24,7 @@ class CreateEvent(APIView):
                 name=request.data['name'],
                 description=request.data['description'],
                 location=request.data['location'],
-                organizer=request.user
+                organizer=request.muta_user
             )
             event.save()
         except Exception as e:
@@ -42,14 +48,14 @@ class CreateEvent(APIView):
 class RegisterAttendee(APIView):
     def __init__(self):
         ...
-
-    def post(self, request):
+    @ValidateSchema(RegisterAttendeeSchema)
+    def post(self, request, event_id):
         response = Response()
         event = None
         attendee = None
         try:
-            event = Event.objects.get(event_id=request.data['event_id'])
-            attendee = EventAttendee.create(
+            event = Event.objects.get(event_id=event_id)
+            attendee = EventAttendee.objects.create(
                 event=event,
                 name=request.data['name'],
                 phone_number=request.data['phone_number'],
@@ -81,7 +87,7 @@ class GetEvent(APIView):
         response = Response()
         event = None
         try:
-            event = Event.objects.get(event_id=request.data['event_id'])
+            event = Event.objects.get(event_id=event_id)
         except Exception as e:
             response.data = {"message":"Event not found"}
             response.status_code = 500
@@ -107,7 +113,7 @@ class GetAllEventsByUser(APIView):
         response = Response()
         events = None
         try:
-            events = Event.objects.filter(organizer=request.user)
+            events = Event.objects.filter(organizer=request.muta_user)
         except Exception as e:
             response.data = {"message":"Events not found"}
             response.status_code = 500
@@ -140,7 +146,7 @@ class GetAllAttendeesByEvent(APIView):
         attendees = None
         try:
             event = Event.objects.get(event_id=event_id)
-            attendees = EventAttendee.objects.filter(event=event).values('user__id', 'user__username', 'user__email')
+            attendees = EventAttendee.objects.filter(event=event).values('name', 'email', 'phone_number', 'created_at')
         except Exception as e:
             response.data = {"message":"Attendees not found"}
             response.status_code = 500
@@ -148,6 +154,7 @@ class GetAllAttendeesByEvent(APIView):
         
         response.data = {
             "message":"Attendees found",
+            "event_id": str(event.event_id),
             "data": attendees
         }
         response.status_code = 200

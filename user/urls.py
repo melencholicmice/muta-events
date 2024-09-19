@@ -3,7 +3,9 @@ from user.views import (
     UserLogin,
     UserSignup,
     ForgetPassword,
-    ResetPassword
+    ResetPassword,
+    VerifyEmail,
+    GetVerificationLink
 )
 
 user_endpoints = [
@@ -11,4 +13,6 @@ user_endpoints = [
     path("sign-up",UserSignup.as_view(), name="Add student to department"),
     path("forget-password", ForgetPassword.as_view() ,name="Get Due by Id"),
     path("reset-password", ResetPassword.as_view(), name="Get Dues"),
+    path("verify-email", VerifyEmail.as_view(), name="Verify Email"),
+    path("send-verification-link", GetVerificationLink.as_view(), name="Get Verification Link"),
 ]

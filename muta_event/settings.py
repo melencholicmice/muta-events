@@ -33,6 +33,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'middleware.user_auth_middleware.UserAuthMiddleware',
+    'middleware.api_usage_tracker_middleware.ApiUsageTrackerMiddleware',
 ]
 
 ROOT_URLCONF = 'muta_event.urls'
@@ -54,10 +56,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'muta_event.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # DATABASES = {
 #     'default': {
@@ -107,6 +105,22 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_PORT = 587
+EMAIL_HOST_USER = getenv('EMAIL_HOST_USER')  
+EMAIL_HOST_PASSWORD = getenv('EMAIL_HOST_PASSWORD')  
+EMAIL_USE_TLS = True
+
 COOKIE_ENCRYPTION_SECRET =  getenv("COOKIE_ENCRYPTION_SECRET") or 'fallback'
 STRIPE_PUBLISHABLE_KEY = getenv("STRIPE_PUBLISHABLE_KEY")
 STRIPE_SECRET_KEY = getenv("STRIPE_SECRET_KEY")
+
+SUBSCRIPTION_CONFIG = {
+    'FREE':{
+        'max_events': 3,
+        'max_attendees_per_event': 3
+    }
+}
+
+FRONTEND_URL = getenv("FRONTEND_URL")

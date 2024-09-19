@@ -17,3 +17,6 @@ class ForgetPasswordSchema(BaseModel):
 class ResetPasswordSchema(BaseModel):
     token:str
     new_password:str
+
+class GetVerificationLinkSchema(BaseModel):
+    email:str

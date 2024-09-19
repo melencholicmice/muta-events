@@ -1,7 +1,8 @@
 import jwt
 import re
+from django.http import JsonResponse
 from user.models import User
-from rest_framework.response import Response
+
 from muta_event.settings import COOKIE_ENCRYPTION_SECRET
 
 class UserAuthMiddleware:
@@ -10,11 +11,10 @@ class UserAuthMiddleware:
         self.protected_paths = [
             '/event/create-event',
             '/event/get-all-events-by-user',
-            '^/get-all-attendees-by-event/[0-9a-fA-F-]{36}/$',
+            '^/event/get-all-attendees-by-event/[0-9a-fA-F-]{36}$',
         ]
 
     def __call__(self, request):
-        response = Response()
         user = None
         path_match = False
 
@@ -25,28 +25,24 @@ class UserAuthMiddleware:
 
         if path_match:
             token = request.headers.get('Authorization')
+
+            if token and token.startswith('Bearer '):
+                token = token.split(' ')[1]
+
             if not token:
-                response.data = {"message":"User not authenticated"}
-                response.status_code = 403
-                return response
+                return JsonResponse({"message": "User not authenticated"}, status=403)
 
             try:
                 payload = jwt.decode(token, COOKIE_ENCRYPTION_SECRET, algorithms='HS256')
                 user = User.objects.get(user_id=payload["user_id"])
                 if not user:
-                    response.data = {"message":"User not authenticated"}
-                    response.status_code = 403
-                    return response
+                    return JsonResponse({"message": "User not authenticated"}, status=403)
             except Exception as e:
-                response.data = {"message":"User not authenticated"}
-                response.status_code = 403
-                return response
+                return JsonResponse({"message": "User not authenticated"}, status=403)
             
-        if not user.is_email_verified:
-            response.data = {"message":"Please verify your email"}
-            response.status_code = 403
-            return response
+            if not user.is_email_verified:
+                return JsonResponse({"message": "Please verify your email"}, status=403)
             
-        request.user = user
+        request.muta_user = user
         response = self.get_response(request)
         return response
