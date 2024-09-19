@@ -10,6 +10,8 @@ djangorestframework = "*"
 pydantic = "*"
 pyjwt = "*"
 bcrypt = "*"
+stripe = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

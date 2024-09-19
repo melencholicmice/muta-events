@@ -17,6 +17,8 @@ class Event(TimestampMixin):
 
     location = models.CharField(max_length=255)
 
+    is_bought = models.BooleanField(default=False)
+
     organizer = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

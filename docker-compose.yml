@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   db:
     image: postgres:13
@@ -7,15 +5,19 @@ services:
       POSTGRES_DB: mydb
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
+    # volumes:
+      # - db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - mutanetwork
 
   web:
     build: .
-    command: bash -c "sleep 10 && python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
@@ -23,5 +25,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - mutanetwork
     environment:
       - DATABASE_URL=postgres://myuser:mypassword@db:5432/mydb
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=mydb
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+
+networks:
+  mutanetwork:
+    driver: bridge
+
+# volumes:
+  # db-data:

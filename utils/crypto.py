@@ -27,5 +27,5 @@ def verify_password(password: str, hashed_password: str) -> bool:
     Returns:
         bool: True if the password matches the hashed password, False otherwise.
     """
-
+    print(password, hashed_password)    
     return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))

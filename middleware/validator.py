@@ -19,7 +19,10 @@ class ValidateSchema:
                     self.schema(**request.data)
                 except ValidationError as e:
                     response = Response()
-                    response.data = loads(e.json())
+                    response.data = {
+                        "message":"Validation Failed",
+                        "reason" :loads(e.json())
+                    }
                     response.status_code = 403
                     return response
                 

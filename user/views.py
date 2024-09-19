@@ -1,5 +1,6 @@
 import jwt
 import datetime
+from django.db import IntegrityError
 from rest_framework.views import APIView
 from middleware.validator import ValidateSchema
 from rest_framework.response import Response
@@ -8,9 +9,10 @@ from user.models import User
 from user.schema import (
     UserLoginSchema,
     UserSignupSchema,
-    ForgetPasswordSchema
+    ForgetPasswordSchema,
+    ResetPasswordSchema
 )
-from utils.crypto import verify_password
+from utils.crypto import verify_password, hash_password
 
 
 class UserLogin(APIView):
@@ -30,6 +32,11 @@ class UserLogin(APIView):
                     correct_token = True
             except:
                 response.data = {"message":"Login failed"}
+        
+        if not user.is_email_verified:
+            response.data = {"message":"Please verify your email"}
+            response.status_code = 403
+            return response
 
         if correct_token:
             response.data  = {
@@ -70,6 +77,11 @@ class UserLogin(APIView):
             response.data = {"message":"Invalid credentials, please try again"}
             response.status_code = 401
             return response
+        
+        if not user.is_email_verified:
+            response.data = {"message":"Please verify your email"}
+            response.status_code = 403
+            return response
 
         payload = {
             "user_id": str(user.user_id),
@@ -100,14 +112,19 @@ class UserSignup(APIView):
                 first_name=request.data['first_name'],
                 last_name=request.data['last_name'],
                 email=request.data['email'],
-                password=request.data['password']
+                password= hash_password(request.data['password'])
             )
             user.save()
+        except IntegrityError as e:
+            response.data = {"message":"User with given credentials already exists"}
+            response.status_code = 409
+            return response
         except Exception as e:
+            print(type(e))
             response.data = {"message":"Signup failed"}
             response.status_code = 500
             return response
-    
+        
         response.data = {
             "message":"Signup successful",
             "data": {
@@ -137,7 +154,7 @@ class ForgetPassword(APIView):
                 "iat": datetime.datetime.utcnow()
             }
             token = jwt.encode(payload, COOKIE_ENCRYPTION_SECRET, algorithm='HS256')
-
+            print(token)
             # :TODO: add send email functionality and send token
         except Exception as e:
             pass
@@ -149,7 +166,7 @@ class ForgetPassword(APIView):
 class ResetPassword(APIView):
     def __init__(self):
         ...
-
+    @ValidateSchema(ResetPasswordSchema)
     def post(self, request):
         response = Response()
         token = request.data['token']
@@ -164,7 +181,7 @@ class ResetPassword(APIView):
                 response.status_code = 500
                 return response
 
-            user.password = new_password
+            user.password = hash_password(new_password)
             user.save()
         except Exception as e:
             response.data = {"message":"Password reset failed"}
