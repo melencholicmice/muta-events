@@ -42,6 +42,27 @@ services:
       - DB_NAME=mydb
       - DB_USER=myuser
       - DB_PASSWORD=mypassword
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672" 
+      - "15672:15672"
+    networks:
+      - mutanetwork
+
+  celery:
+    build:
+      context: ./
+    command: celery -A muta_event worker --loglevel=info
+    volumes:
+      - ./backend:/code
+    depends_on:
+      - rabbitmq
+      - db
+    networks:
+      - mutanetwork
 
 networks:
   mutanetwork:

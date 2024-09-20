@@ -13,6 +13,8 @@ bcrypt = "*"
 stripe = "*"
 python-dotenv = "*"
 google-auth-oauthlib = "*"
+celery = {extras = ["redis"], version = "*"}
+django-celery-beat = "*"
 
 [dev-packages]
 

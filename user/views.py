@@ -2,17 +2,19 @@ import jwt
 import stripe
 import datetime
 from django.shortcuts import redirect
-from django.core.mail import send_mail
 from django.db import IntegrityError
 from rest_framework.views import APIView
 from middleware.validator import ValidateSchema
 from rest_framework.response import Response
 from muta_event.settings import (
     COOKIE_ENCRYPTION_SECRET,
-    EMAIL_HOST_USER,
     FRONTEND_URL
 )
 from django.http import JsonResponse
+from user.tasks import (
+    send_verification_email_task , 
+    send_reset_email_task
+)
 from user.models import User, SubscriptionEnum
 from user.schema import (
     UserLoginSchema,
@@ -24,27 +26,6 @@ from user.schema import (
 from rest_framework import serializers
 from utils.crypto import verify_password, hash_password
 from user.google_auth_plugin import GoogleSdkLoginFlowService
-
-
-def send_email_verification_mail(email):
-    payload = {
-        "email":email,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=60*24*2),
-        "iat": datetime.datetime.utcnow()
-    }
-
-    token = jwt.encode(payload, COOKIE_ENCRYPTION_SECRET, algorithm='HS256')
-    message = f"Click on the link to verify your email: {FRONTEND_URL}/verify-email?token={token}"
-
-    ## for testing only
-    print(f'http://localhost:3000/user/verify-email?token={token}')
-    # send_mail(
-    #     subject="Muta Events Email Verification",
-    #     message=message,
-    #     from_email=EMAIL_HOST_USER,
-    #     recipient_list=[email],
-    #     fail_silently=True
-    # )
 
 class UserLogin(APIView):
     def __init__(self):
@@ -166,7 +147,7 @@ class UserSignup(APIView):
         }
 
         try:
-            send_email_verification_mail(user.email)
+            send_verification_email_task.delay(email=user.email)
         except Exception as e:
             pass
 
@@ -180,35 +161,18 @@ class ForgetPassword(APIView):
 
     @ValidateSchema(ForgetPasswordSchema)
     def post(self, request):
+        user = None
         response = Response()
         email = request.data['email']
         try:
             user = User.objects.get(email=email)
-            payload = {
-                "user_id": str(user.user_id),
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=60*24*2),
-                "iat": datetime.datetime.utcnow()
-            }
-
-            token = jwt.encode(payload, COOKIE_ENCRYPTION_SECRET, algorithm='HS256')
-            # :TODO: make this better and add celerys
-            message = f"Click on the link to reset your password: {FRONTEND_URL}/reset-password?token={token}"
-            try:
-                send_mail(
-                    subject="Muta Events password Reset",
-                    message=message,
-                    from_email=EMAIL_HOST_USER,
-                    recipient_list=[email],
-                    fail_silently=False
-                )
-            except Exception as e:
-                response.data = {"message":"Password reset link sent to your email but email not exists"}
-                response.status_code = 200
-                return response
-
         except Exception as e:
-            pass
+            response.data = {"message":"Password reset failed"}
+            response.status_code = 500
+            return response 
 
+        send_reset_email_task.delay(email=email, user_id=user.user_id)
+        
         response.data = {"message":"Password reset link sent to your email if email exists"}
         response.status_code = 200
         return response
@@ -250,7 +214,7 @@ class GetVerificationLink(APIView):
         response = Response()
         email = request.data['email']
         try:
-            send_email_verification_mail(email)
+            send_verification_email_task.delay(email)
         except Exception as e:
             response.data = {"message":"Email verification failed"}
             response.status_code = 500

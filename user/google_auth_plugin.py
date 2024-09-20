@@ -69,7 +69,6 @@ class GoogleSdkLoginFlowService:
     def _get_redirect_uri(self):
         domain = BASE_BACKEND_URL
         redirect_uri = f"{domain}/user/google-auth-callback"
-        print("redirect_uri =========> ", redirect_uri)
         return redirect_uri
 
     def _generate_client_config(self):
