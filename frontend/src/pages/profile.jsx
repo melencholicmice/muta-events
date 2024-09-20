@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Avatar, Container, Button, Link } from '@mui/material';
 import { styled } from '@mui/system';
 import UserInfoSection from '../components/UserInfoSection';
 import { EventList } from '../components/displayEventSection';
-import BuyEventButton from '../components/BuyEventButton';
-import BuyPremiumButton from '../components/BuyPremiumButton';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { API_URL } from '../config';
 
 const ProfileContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -25,9 +26,49 @@ const ProfileInfo = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(3),
 }));
 
+
 const Profile = () => {
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
+  const navigate = useNavigate();
+
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    const fetchUserData = async (token) => {
+      if(token){
+        localStorage.setItem('token', token);   
+      }
+      token = localStorage.getItem('token');
+      if(!token) {
+          const authCookie = document.cookie.split('; ').find(row => row.startsWith('Authorization='));
+          console.log(authCookie)
+          if (!authCookie) {
+            toast.error('Please login to view this page');
+            navigate('/home');
+            return;
+          }
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/user/get-user-data`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.status != 200) {
+          throw new Error('Failed to fetch user data');
+        }
+        const data = await response.json();
+        setUserData(data);
+      } catch (error) {
+        console.log(error)
+        toast.error('Error fetching user data:', error);
+        navigate('/home');
+      }
+    };
+
+    fetchUserData(token);
+  }, [navigate]);
 
   return (
     <ProfileContainer maxWidth="sm">
@@ -48,7 +89,7 @@ const Profile = () => {
       </Button>
       <UserInfoSection token={token} />
       <Box sx={{ width: '100%', mt: 4 }}>
-        <EventList token={token} />
+        {userData ? (<EventList token={token} sub={userData.subscription_type}/>) : (<>Loading....</>)}
       </Box>
       <Box sx={{ mt: 3 }}>
         <Button

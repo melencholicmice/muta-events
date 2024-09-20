@@ -4,7 +4,7 @@ import { API_URL } from '../config';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const EventListItem = ({ id, name, is_bought }) => {
+const EventListItem = ({ id, name, is_bought,subscription_type }) => {
   return (
     <ListItem sx={{ border: '1px solid #ccc', borderRadius: '4px', mb: 2, padding: '16px' }}>
       <ListItemText
@@ -42,7 +42,7 @@ const EventListItem = ({ id, name, is_bought }) => {
               fontSize="1.2rem" 
               mr={1}
             >
-               {is_bought ? (
+               {is_bought || subscription_type != 'basic' ? (
                     <Link
                     href={`/edit-event?event_id=${id}`}
                     target="_blank" 
@@ -59,7 +59,7 @@ const EventListItem = ({ id, name, is_bought }) => {
   );
 };
 
-const EventList = ({token}) => {
+const EventList = ({token, subscription_type}) => {
   const [events, setEvents] = useState([]);
   const navigate = useNavigate();
 
@@ -97,7 +97,7 @@ const EventList = ({token}) => {
         <Typography variant="h4" gutterBottom align="center" sx={{ mb: 3 }}>Event List</Typography>
         <List sx={{ width: '100%' }}>
           {events.map((event) => (
-            <EventListItem key={event.id} id={event.event_id} name={event.name} is_bought={event.is_bought} />
+            <EventListItem key={event.id} id={event.event_id} name={event.name} is_bought={event.is_bought}  subscription_type={subscription_type}/>
           ))}
         </List>
       </Box>

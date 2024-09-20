@@ -53,7 +53,7 @@ const CreateEventForm = () => {
             .then(response => {
                 if (response.status !== 200) {
                     return response.json().then(data => {
-                        throw new Error(data.message || 'Network response was not ok');
+                        throw new Error(data.message);
                     });
                 }
                 return response.json();
@@ -63,8 +63,8 @@ const CreateEventForm = () => {
                 toast.success('Event created successfully!');
             })
             .catch((error) => {
-                console.error('Error:', error);
                 toast.error(error);
+                console.error('Error:', error);
             });
         }
     };

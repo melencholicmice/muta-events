@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Container, CircularProgress, Link, Button } from '@mui/material';
 import ShowEvent from '../components/ShowEvent';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { API_URL } from '../config';
 import { AttendeeList } from '../components/showAttendees';
 
 const EventPage = () => {
   const [eventData, setEventData] = useState(null);
   const location = useLocation();
+  const navigator = useNavigate();
   const params = new URLSearchParams(location.search);
   const event_id = params.get('event_id');
   const [loading, setLoading] = useState(true);
@@ -17,6 +18,9 @@ const EventPage = () => {
       const fetchEventData = async () => {
           try {
               const token = localStorage.getItem('token');
+              if(!token){
+                navigator('/home')
+              }
               const response = await fetch(`${API_URL}/event/get-event/${event_id}`, {
                   headers: {
                       'Authorization': `Bearer ${token}`

@@ -2,12 +2,16 @@ import React from 'react';
 import { Button, Typography, Container, Box, Paper } from '@mui/material';
 import Login from '../components/LoginForm';
 import SignUpForm from '../components/SignUpForm';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { API_URL } from '../config';
 
 
 const Home = () => {
+  const navigator = useNavigate()
   const googleAuthLink = `${API_URL}/user/google-auth-redirect`;
+  if(localStorage.getItem('token')){
+    navigator('/profile')
+  }
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
       <Typography variant="h4" align="center" gutterBottom>

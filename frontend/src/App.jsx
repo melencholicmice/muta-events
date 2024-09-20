@@ -9,6 +9,7 @@ import CreateEventForm from './pages/createEvent';
 import EventPage from './pages/event';
 import RegisterEvent from './pages/resgisterEvent';
 import EditEventForm from './pages/editEvent';
+import VerifyEmail from './pages/verifyEmail';
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/event" element={<EventPage />} />
         <Route path="/register-event" element={<RegisterEvent />} />
         <Route path="/edit-event" element={<EditEventForm />} />
+        <Route path="verify-email" element={<VerifyEmail />} />
       </Routes>
       </BrowserRouter>
     </>

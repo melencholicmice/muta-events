@@ -69,7 +69,7 @@ const RegisterEvent = () => {
           fullWidth
           sx={{ py: 1.5 }}
         >
-          <Link to='/home' rel="noopener noreferrer">
+          <Link href='/home' rel="noopener noreferrer">
             Home
           </Link>
         </Button>

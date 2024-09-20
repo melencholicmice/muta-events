@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Box, Typography, CircularProgress } from '@mui/material';
+import { Box, Typography, CircularProgress, Link } from '@mui/material';
 import { API_URL } from '../config';
 
 const ShowEvent = ({event_id, name, description, location}) => {
@@ -13,6 +13,13 @@ const ShowEvent = ({event_id, name, description, location}) => {
           <Typography variant="body1">Description: {description}</Typography>
           <Typography variant="body2">Event ID:{event_id} </Typography>
           <Typography variant="body2">Location: {location}</Typography>
+          <Typography variant="body2">
+            <Link
+              href={`/register-event?event_id=${event_id}`}
+            >
+              Register
+            </Link>
+          </Typography>
         </>
       ) : (
         <Typography>No event data available</Typography>

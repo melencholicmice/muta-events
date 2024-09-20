@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography } from '@mui/material';
 import { API_URL } from '../config';
+import { toast } from 'react-toastify';
 
 const EventRegistrationForm = ({event_id}) => {
 
@@ -24,7 +25,7 @@ const EventRegistrationForm = ({event_id}) => {
     // Handle form submission logic here
     console.log('Form submitted:', formData);
     // Reset form after submission
-    setFormData({ name: '', phone_number_number: '', email: '' });
+    setFormData({ name: '', phone_number: '', email: '' });
 
     fetch(`${API_URL}/event/register-event/${event_id}`, {
       method: 'POST',
@@ -36,6 +37,7 @@ const EventRegistrationForm = ({event_id}) => {
       .then(response => response.json())
       .then(data => {
         console.log('Success:', data.message);
+        toast.info(data.message)
       })
       .catch((error) => {
         console.error('Error:', error);
