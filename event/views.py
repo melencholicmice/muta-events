@@ -274,3 +274,4 @@ def buy_single_event(request):
     
     return redirect(checkout_session.url, code=303)
 
+    

@@ -12,6 +12,7 @@ pyjwt = "*"
 bcrypt = "*"
 stripe = "*"
 python-dotenv = "*"
+google-auth-oauthlib = "*"
 
 [dev-packages]
 

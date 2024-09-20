@@ -7,6 +7,8 @@ from user.views import (
     VerifyEmail,
     GetVerificationLink,
     GetUserData,
+    GoogleAuthCallback,
+    GoogleAuthRedirect,
     buy_premium_plan
 )
 
@@ -19,4 +21,6 @@ user_endpoints = [
     path("send-verification-link", GetVerificationLink.as_view(), name="Get Verification Link"),
     path("buy-premium-subscription", buy_premium_plan, name="Buy Premium Subscription"),
     path("get-user-data", GetUserData.as_view(), name="Get User Data"),
+    path("google-auth-callback", GoogleAuthCallback.as_view(), name="Google Auth Callback"),
+    path("google-auth-redirect", GoogleAuthRedirect.as_view(), name="Google Auth Redirect"),
 ]

@@ -21,7 +21,9 @@ from user.schema import (
     ResetPasswordSchema,
     GetVerificationLinkSchema
 )
+from rest_framework import serializers
 from utils.crypto import verify_password, hash_password
+from user.google_auth_plugin import GoogleSdkLoginFlowService
 
 
 def send_email_verification_mail(email):
@@ -297,6 +299,106 @@ class GetUserData(APIView):
             "subscription_type":user.subscription,
         }
         response.status_code = 200
+        return response
+    
+class GoogleAuthRedirect(APIView):
+    def __init__(self):
+        ...
+    
+    def get(self, request):
+        response = Response()
+        google_login = GoogleSdkLoginFlowService()
+
+        auth_url, state = google_login.get_authorization_url()
+
+        request.session['google_oauth2_state'] = state
+
+        return redirect(auth_url)
+
+
+class GoogleAuthCallback(APIView):
+    class InputSerializer(serializers.Serializer):
+        code = serializers.CharField(required=False)
+        error = serializers.CharField(required=False)
+        state = serializers.CharField(required=False)
+
+
+    def __init__(self):
+        ...
+
+    def get(self, request, *args, **kwargs):
+        response = Response()
+        input_serializer = self.InputSerializer(data=request.GET)
+        input_serializer.is_valid(raise_exception=True)
+
+        validated_data = input_serializer.validated_data
+
+        code = validated_data.get("code")
+        error = validated_data.get("error")
+        state = validated_data.get("state")
+
+        if error is not None:
+            response.data = {"message": error}
+            response.status_code = 400
+            return response
+        
+        if code is None or state is None:
+            response.data = {"message": "Invalid request"}
+            response.status_code = 400
+            return response
+
+        session_state = request.session.get("google_oauth2_state")
+
+        if session_state is None:
+            response.data = {"message": "Invalid request"}
+            response.status_code = 400
+            return response
+
+        del request.session["google_oauth2_state"]
+
+        if state != session_state:
+            response.data = {"message": "Invalid request"}
+            response.status_code = 400
+            return response
+        
+        google_login_flow = GoogleSdkLoginFlowService()
+
+        google_tokens = google_login_flow.get_tokens(code=code, state=state)
+
+        id_token_decoded = google_login_flow.decode_id_token(id_token=google_tokens.id_token)
+        user_info = google_login_flow.get_user_info(google_tokens=google_tokens)
+
+        user_email = id_token_decoded["email"]
+
+        try:
+            muta_user = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            muta_user = User.objects.create(
+                email=user_email,
+                first_name=user_info["given_name"],
+                last_name=user_info["family_name"],
+                is_email_verified=True,
+                subscription=SubscriptionEnum.BASIC.internal,
+            )
+            muta_user.save()
+        except Exception as e:
+            response.data = {"message": "Something went wrong"}
+            response.status_code = 500
+            return response
+
+        payload = {
+            "user_id": str(muta_user.user_id),
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=60*24*2),
+            "iat": datetime.datetime.utcnow()
+        }
+
+        token = jwt.encode(payload, COOKIE_ENCRYPTION_SECRET, algorithm='HS256')
+
+        response.set_cookie(key='Authorization', value=token, httponly=True, samesite=None)
+        response.data = {
+            "message":"Login Succesful",
+            "token":token
+        }
         return response
     
 def buy_premium_plan(request):
