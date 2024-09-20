@@ -167,6 +167,7 @@ class ForgetPassword(APIView):
         try:
             user = User.objects.get(email=email)
         except Exception as e:
+            print(e)
             response.data = {"message":"Password reset failed"}
             response.status_code = 500
             return response 
@@ -214,7 +215,7 @@ class GetVerificationLink(APIView):
         response = Response()
         email = request.data['email']
         try:
-            send_verification_email_task.delay(email)
+            send_verification_email_task.delay(email,)
         except Exception as e:
             response.data = {"message":"Email verification failed"}
             response.status_code = 500
@@ -334,8 +335,11 @@ class GoogleAuthCallback(APIView):
 
         user_email = id_token_decoded["email"]
 
+        muta_user = None
+
         try:
             muta_user = User.objects.get(email=user_email)
+            print(muta_user)
         except User.DoesNotExist:
             muta_user = User.objects.create(
                 email=user_email,
@@ -357,13 +361,9 @@ class GoogleAuthCallback(APIView):
         }
 
         token = jwt.encode(payload, COOKIE_ENCRYPTION_SECRET, algorithm='HS256')
+        response.set_cookie('Authorization', token, httponly=True, samesite=None)
 
-        response.set_cookie(key='Authorization', value=token, httponly=True, samesite=None)
-        response.data = {
-            "message":"Login Succesful",
-            "token":token
-        }
-        return response
+        return redirect(FRONTEND_URL + f'/profile?token={token}')
     
 def buy_premium_plan(request):
     if request.method != 'GET':

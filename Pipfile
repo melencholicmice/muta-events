@@ -16,6 +16,7 @@ google-auth-oauthlib = "*"
 celery = {extras = ["redis"], version = "*"}
 django-celery-beat = "*"
 reportlab = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

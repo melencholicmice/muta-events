@@ -38,6 +38,7 @@ def send_email_password_reset_mail(email, user_id):
         }
         token = jwt.encode(payload, COOKIE_ENCRYPTION_SECRET, algorithm='HS256')
         message = f"Click on the link to reset your password: {FRONTEND_URL}/reset-password?token={token}"
+        print(message)
         send_mail(
             subject="Muta Events password Reset",
             message=message,
@@ -50,9 +51,9 @@ def send_email_password_reset_mail(email, user_id):
 
 
 @shared_task
-def send_verification_email_task(subject, message, from_email, recipient_list):
+def send_verification_email_task(email):
     print("Sending verification email...")
-    send_email_verification_mail(subject, message, from_email, recipient_list)
+    send_email_verification_mail(email)
 
 @shared_task
 def send_reset_email_task(email,user_id):
