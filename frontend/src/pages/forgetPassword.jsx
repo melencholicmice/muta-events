@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Container, Typography } from '@mui/material';
+import { Container, Typography, Button, Box, Link } from '@mui/material';
 import ForgetPasswordForm from '../components/ForgetPasswordForm';
 
 const ForgetPassword = () => {
@@ -10,6 +10,18 @@ const ForgetPassword = () => {
         Forget Password
       </Typography>
       <ForgetPasswordForm />
+      <Box sx={{ mt: 3 }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          fullWidth
+          sx={{ py: 1.5 }}
+        >
+          <Link to='/home' rel="noopener noreferrer">
+            Home
+          </Link>
+        </Button>
+      </Box>
     </Container>
   );
 };

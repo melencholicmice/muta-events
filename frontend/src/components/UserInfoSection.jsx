@@ -3,6 +3,9 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config';
 import { toast } from 'react-toastify';
+import BuyPremiumButton from './BuyPremiumButton';
+import BuyEventButton from './BuyEventButton';
+
 
 const UserInfoSection = ({token}) => {
   const [userData, setUserData] = useState(null);
@@ -20,7 +23,7 @@ const UserInfoSection = ({token}) => {
           if (!authCookie) {
             toast.error('Please login to view this page');
             navigate('/home');
-            return;
+            return;userData.subscription_type !== 'basic'
           }
       }
 
@@ -57,7 +60,6 @@ const UserInfoSection = ({token}) => {
   if (!userData) {
     return null;
   }
-
   return (
     <Box
       sx={{
@@ -67,6 +69,10 @@ const UserInfoSection = ({token}) => {
         boxShadow: 1,
       }}
     >
+      <Box sx={{ display: 'flex', flexDirection:'column', alignItems: 'space-between', width: '100%', mb: 2 }}>
+        <BuyEventButton isAvailable={userData.subscription_type == 'basic'}/>
+        <BuyPremiumButton isPremium={userData.subscription_type == 'basic'}/>
+      </Box>
       <Typography variant="h5" gutterBottom>
         User Information
       </Typography>

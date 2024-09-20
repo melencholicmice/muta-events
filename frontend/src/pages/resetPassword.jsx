@@ -1,7 +1,7 @@
 
 import React from 'react';
 import ResetPasswordForm from '../components/ResetPasswordForm';
-import { Container, Typography, Box } from '@mui/material';
+import { Container, Typography, Box, Button, Link } from '@mui/material';
 
 const ResetPassword = () => {
   return (
@@ -18,6 +18,18 @@ const ResetPassword = () => {
           Reset Password
         </Typography>
         <ResetPasswordForm />
+      </Box>
+      <Box sx={{ mt: 3 }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          fullWidth
+          sx={{ py: 1.5 }}
+        >
+          <Link to='/home' rel="noopener noreferrer">
+            Home
+          </Link>
+        </Button>
       </Box>
     </Container>
   );

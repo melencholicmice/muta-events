@@ -15,6 +15,7 @@ from user.models import User , SubscriptionEnum
 from rest_framework.response import Response
 from muta_event.settings import FRONTEND_URL, STRIPE_SECRET_KEY
 from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
 
 stripe.api_key = STRIPE_SECRET_KEY
 
@@ -22,6 +23,7 @@ class CreateEvent(APIView):
     def __init__(self):
         ...
 
+    @csrf_exempt
     @ValidateSchema(CreateEventSchema)
     def post(self, request):
         response = Response()

@@ -1,14 +1,17 @@
-
 import React from 'react';
-import { Box, Typography, Avatar, Container } from '@mui/material';
+import { Box, Typography, Avatar, Container, Button, Link } from '@mui/material';
 import { styled } from '@mui/system';
 import UserInfoSection from '../components/UserInfoSection';
+import { EventList } from '../components/displayEventSection';
+import BuyEventButton from '../components/BuyEventButton';
+import BuyPremiumButton from '../components/BuyPremiumButton';
 
 const ProfileContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
+  padding: theme.spacing(4),
 }));
 
 const ProfileAvatar = styled(Avatar)(({ theme }) => ({
@@ -19,6 +22,7 @@ const ProfileAvatar = styled(Avatar)(({ theme }) => ({
 
 const ProfileInfo = styled(Box)(({ theme }) => ({
   textAlign: 'center',
+  marginBottom: theme.spacing(3),
 }));
 
 const Profile = () => {
@@ -27,22 +31,37 @@ const Profile = () => {
 
   return (
     <ProfileContainer maxWidth="sm">
-      <UserInfoSection token={token}/>
+      <ProfileInfo>
         <Typography variant="h4" gutterBottom>
-          John Doe
+          User Profile
         </Typography>
-        <Typography variant="body1" color="textSecondary" paragraph>
-          Software Developer
-        </Typography>
-        <Typography variant="body2" paragraph>
-          Passionate about creating innovative solutions and learning new technologies.
-        </Typography>
-        <Typography variant="body2">
-          Email: john.doe@example.com
-        </Typography>
-        <Typography variant="body2">
-          Location: San Francisco, CA
-        </Typography>
+      </ProfileInfo>
+
+      <Button
+        variant="contained"
+        color="primary"
+        href="/create-event"
+        size="large"
+        sx={{ mt: 2, mb: 4 }}
+      >
+        Create Event
+      </Button>
+      <UserInfoSection token={token} />
+      <Box sx={{ width: '100%', mt: 4 }}>
+        <EventList token={token} />
+      </Box>
+      <Box sx={{ mt: 3 }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          fullWidth
+          sx={{ py: 1.5 }}
+        >
+          <Link to='/home' rel="noopener noreferrer">
+            Home
+          </Link>
+        </Button>
+      </Box>
     </ProfileContainer>
   );
 };

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import SendVerificationLinkForm from '../components/SendVerificationLinkForm';
-import { Container, Typography, Box } from '@mui/material';
+import { Container, Typography, Box, Button, Link } from '@mui/material';
 
 const SendVerificationLink = () => {
   return (
@@ -18,6 +18,18 @@ const SendVerificationLink = () => {
           Send Verification Link
         </Typography>
         <SendVerificationLinkForm />
+      </Box>
+      <Box sx={{ mt: 3 }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          fullWidth
+          sx={{ py: 1.5 }}
+        >
+          <Link to='/home' rel="noopener noreferrer">
+            Home
+          </Link>
+        </Button>
       </Box>
     </Container>
   );

@@ -5,6 +5,10 @@ import Profile from './pages/profile';
 import ForgetPassword from './pages/forgetPassword';
 import ResetPassword from './pages/resetPassword';
 import SendVerificationLink from './pages/sendVerificationLink';
+import CreateEventForm from './pages/createEvent';
+import EventPage from './pages/event';
+import RegisterEvent from './pages/resgisterEvent';
+import EditEventForm from './pages/editEvent';
 
 
 function App() {
@@ -18,14 +22,10 @@ function App() {
         <Route path="/forget-password" element={<ForgetPassword />} />
         <Route path="/reset-password" element={<ResetPassword/>} />
         <Route path="/send-verification-link" element={<SendVerificationLink/>} />
-        {/* <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} /> */}
+        <Route path="/create-event" element={<CreateEventForm/>} />
+        <Route path="/event" element={<EventPage />} />
+        <Route path="/register-event" element={<RegisterEvent />} />
+        <Route path="/edit-event" element={<EditEventForm />} />
       </Routes>
       </BrowserRouter>
     </>
