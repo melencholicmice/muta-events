@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { TextField, Button, Container, Box } from "@mui/material";
 import { Link } from "react-router-dom";
-import { API_URL } from "../config";
+import { API_URL, RECAPTCHA_SITE_KEY } from "../config";
 import { toast } from 'react-toastify';
+import ReCAPTCHA from "react-google-recaptcha";
 import 'react-toastify/dist/ReactToastify.css';
 
 
 const SignUpForm = () => {
+    const recaptchaRef = useRef();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -15,9 +17,13 @@ const SignUpForm = () => {
     const [lastNameError, setLastNameError] = useState(false);
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
+    const [recaptchaValue, setRecaptchaValue] = useState(null);
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
+
+        // const recaptchaValue = await recaptchaRef.current.executeAsync();
+        // recaptchaRef.current.reset();
         setFirstNameError(false);
         setLastNameError(false);
         setEmailError(false);
@@ -36,6 +42,11 @@ const SignUpForm = () => {
             setPasswordError(true);
         }
 
+        if (!recaptchaValue) {
+            toast.error("Please complete the reCAPTCHA.");
+            return;
+        }
+
         if (firstName && lastName && email && password) {
             fetch(`${API_URL}/user/sign-up`, {
                 method: 'POST',
@@ -46,23 +57,29 @@ const SignUpForm = () => {
                     "first_name" :firstName, 
                     "last_name": lastName,
                     "email": email,
-                    "password" :password
+                    "password" :password,
+                    "recaptcha": recaptchaValue,
                 }),
                 credentials: 'include',
             })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
                 return response.json();
+            })
+            .then((data) => {
+                if (data.status === 200) {
+                    toast.success(data.message);
+                }
+                else {
+                    toast.error(data.message);
+                }
             })
             .then(data => {
                 console.log('Success:', data);
-                toast.success('Sign up successful!, Now login');
+                toast.success(data.message);
             })
             .catch((error) => {
                 console.error('Error:', error);
-                toast.error('Sign up failed. Please try again.');
+                toast.error(error);
             });
         }
     };
@@ -137,6 +154,11 @@ const SignUpForm = () => {
                     value={password}
                     error={passwordError}
                     helperText={passwordError ? "Password is required" : ""}
+                />
+
+                <ReCAPTCHA 
+                   sitekey={RECAPTCHA_SITE_KEY}
+                   onChange={(value) => setRecaptchaValue(value)}
                 />
 
                 <Button

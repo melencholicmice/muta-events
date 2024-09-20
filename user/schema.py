@@ -9,6 +9,7 @@ class UserSignupSchema(BaseModel):
     last_name:str
     email:str
     password:str
+    recaptcha: str  
 
 
 class ForgetPasswordSchema(BaseModel):

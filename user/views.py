@@ -1,6 +1,7 @@
 import jwt
 import stripe
 import datetime
+import requests
 from django.shortcuts import redirect
 from django.db import IntegrityError
 from rest_framework.views import APIView
@@ -8,7 +9,8 @@ from middleware.validator import ValidateSchema
 from rest_framework.response import Response
 from muta_event.settings import (
     COOKIE_ENCRYPTION_SECRET,
-    FRONTEND_URL
+    FRONTEND_URL,
+    RECAPTCHA_SECRET_KEY
 )
 from django.http import JsonResponse
 from user.tasks import (
@@ -119,6 +121,23 @@ class UserSignup(APIView):
     def post(self, request):
         response = Response()
         user = None
+
+        recaptcha_response = request.data['recaptcha']
+        payload = {
+            'secret': RECAPTCHA_SECRET_KEY,
+            'response': recaptcha_response,
+        }
+
+        recaptcha_verification_response = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify', data=payload
+        )
+        verification_result = recaptcha_verification_response.json()
+        print(verification_result)
+        if not verification_result.get('success'):
+            response.data = {"message":"Invalid reCAPTCHA"}
+            response.status_code = 400
+            return response
+        
         try:
             user = User.objects.create(
                 first_name=request.data['first_name'],
@@ -364,6 +383,7 @@ class GoogleAuthCallback(APIView):
         response.set_cookie('Authorization', token, httponly=True, samesite=None)
 
         return redirect(FRONTEND_URL + f'/profile?token={token}')
+
     
 def buy_premium_plan(request):
     if request.method != 'GET':

@@ -11,7 +11,6 @@ from user.models import User , UserPayment
 from user.models import SubscriptionEnum
 from event.models import Event 
 from event.tasks import generate_pdf_and_send_mail
-from user.searializers import UserPaymentSerializer
 
 def  create_checkout_session(request):
     try:
