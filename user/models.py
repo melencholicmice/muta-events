@@ -44,3 +44,22 @@ class User(TimestampMixin):
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
 
+class UserPayment(TimestampMixin):
+    payment_id = models.UUIDField(
+        primary_key=True,
+        default=uuid4,
+        editable=False
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='user_payments'
+    )
+
+    payment_boolean = models.BooleanField(default=False)
+
+    payment_amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    stripe_checkout_session_id = models.CharField(max_length=255)
+

@@ -5,7 +5,9 @@ from user.views import (
     ForgetPassword,
     ResetPassword,
     VerifyEmail,
-    GetVerificationLink
+    GetVerificationLink,
+    GetUserData,
+    buy_premium_plan
 )
 
 user_endpoints = [
@@ -15,4 +17,6 @@ user_endpoints = [
     path("reset-password", ResetPassword.as_view(), name="Get Dues"),
     path("verify-email", VerifyEmail.as_view(), name="Verify Email"),
     path("send-verification-link", GetVerificationLink.as_view(), name="Get Verification Link"),
+    path("buy-premium-subscription", buy_premium_plan, name="Buy Premium Subscription"),
+    path("get-user-data", GetUserData.as_view(), name="Get User Data"),
 ]

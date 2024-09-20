@@ -11,7 +11,7 @@ SECRET_KEY = 'django-insecure-_86yz8)=br_x6$=2eu_@14havrmj@&2wr1sf&rl*g41#dc^ihk
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -115,6 +115,7 @@ EMAIL_USE_TLS = True
 COOKIE_ENCRYPTION_SECRET =  getenv("COOKIE_ENCRYPTION_SECRET") or 'fallback'
 STRIPE_PUBLISHABLE_KEY = getenv("STRIPE_PUBLISHABLE_KEY")
 STRIPE_SECRET_KEY = getenv("STRIPE_SECRET_KEY")
+STRIPE_ENDPOINT_SECRET = getenv("STRIPE_ENDPOINT_SECRET")
 
 SUBSCRIPTION_CONFIG = {
     'FREE':{

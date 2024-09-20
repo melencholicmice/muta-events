@@ -1,4 +1,12 @@
 services:
+  # frontend:
+  #   build:
+  #     context: ./frontend 
+  #     dockerfile: ../Dockerfile.frontend
+  #   ports:
+  #     - '3000:80'
+  #   networks:
+  #     - mutanetwork
   db:
     image: postgres:13
     environment:

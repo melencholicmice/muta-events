@@ -1,5 +1,7 @@
 import jwt
+import stripe
 import datetime
+from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from rest_framework.views import APIView
@@ -10,7 +12,8 @@ from muta_event.settings import (
     EMAIL_HOST_USER,
     FRONTEND_URL
 )
-from user.models import User
+from django.http import JsonResponse
+from user.models import User, SubscriptionEnum
 from user.schema import (
     UserLoginSchema,
     UserSignupSchema,
@@ -279,3 +282,46 @@ class VerifyEmail(APIView):
         response.data = {"message":"Email verified successfully"}
         response.status_code = 200
         return response
+
+class GetUserData(APIView):
+    def __init__(self):
+        ...
+    
+    def get(self, request):
+        response = Response()
+        user = request.muta_user
+        response.data = {
+            "user_id": str(user.user_id),
+            "name":user.first_name + " " + user.last_name,
+            "email":user.email,
+            "subscription_type":user.subscription,
+        }
+        response.status_code = 200
+        return response
+    
+def buy_premium_plan(request):
+    if request.method != 'GET':
+        return JsonResponse({"message":"Method not allowed"}, status=405)
+    
+    checkout_session = None
+    base_url = request.build_absolute_uri('/')
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            line_items=[
+                {
+                    'price': 'price_1Q0sMNP01A1kBUrCzNPUe8Lr',
+                    'quantity': 1,
+                },
+            ],
+            mode='payment',
+            success_url= base_url + 'user/get-user-data',
+            cancel_url= FRONTEND_URL + '?canceled=true',
+        )
+    except Exception as e:
+        print(e)
+        return JsonResponse({"message":"Payment failed"}, status=500)
+
+    if not checkout_session:
+        JsonResponse({"message":"Payment failed"}, status=500)
+    
+    return redirect(checkout_session.url, code=303)

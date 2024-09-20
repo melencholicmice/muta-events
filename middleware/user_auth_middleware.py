@@ -11,7 +11,10 @@ class UserAuthMiddleware:
         self.protected_paths = [
             '/event/create-event',
             '/event/get-all-events-by-user',
+            '/event/get-all-bought-events',
             '^/event/get-all-attendees-by-event/[0-9a-fA-F-]{36}$',
+            '^/event/edit-bought-event/[0-9a-fA-F-]{36}$',
+            '/user/get-user-data'
         ]
 
     def __call__(self, request):
