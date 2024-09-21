@@ -2,8 +2,8 @@
 FROM python:3.11-slim
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Set work directory
 WORKDIR /app
@@ -26,6 +26,7 @@ EXPOSE 8000
 
 # Run migrations
 RUN python manage.py makemigrations
+RUN python manage.py migrate
 
 # Run the application
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

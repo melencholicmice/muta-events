@@ -1,6 +1,5 @@
 import jwt
 import datetime
-from celery import shared_task
 from django.core.mail import send_mail
 from user.models import User
 
@@ -50,12 +49,12 @@ def send_email_password_reset_mail(email, user_id):
         pass
 
 
-@shared_task
+
 def send_verification_email_task(email):
     print("Sending verification email...")
     send_email_verification_mail(email)
 
-@shared_task
+
 def send_reset_email_task(email,user_id):
     print("Sending reset email...")
     send_email_password_reset_mail(email,user_id)

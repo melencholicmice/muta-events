@@ -7,21 +7,21 @@ services:
   #     - '3000:80'
   #   networks:
   #     - mutanetwork
-  db:
-    image: postgres:13
-    environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-    # volumes:
-      # - db-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - mutanetwork
+  # db:
+  #   image: postgres:13
+  #   environment:
+  #     POSTGRES_DB: mydb
+  #     POSTGRES_USER: myuser
+  #     POSTGRES_PASSWORD: mypassword
+  #   # volumes:
+  #     # - db-data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - mutanetwork
 
   web:
     build: .
@@ -30,46 +30,46 @@ services:
       - .:/app
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - mutanetwork
+    # depends_on:
+      # db:
+        # condition: service_healthy
+    # networks:
+      # - mutanetwork
     environment:
       - DJANGO_SUPERUSER_USERNAME=admin
       - DJANGO_SUPERUSER_EMAIL=admin@example.com
       - DJANGO_SUPERUSER_PASSWORD=admin
       - DATABASE_URL=postgres://myuser:mypassword@db:5432/mydb
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=mydb
-      - DB_USER=myuser
-      - DB_PASSWORD=mypassword
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      # - DB_HOST=db
+      # - DB_PORT=5432
+      # - DB_NAME=mydb
+      # - DB_USER=myuser
+      # - DB_PASSWORD=mypassword
+      # - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
 
-  rabbitmq:
-    image: "rabbitmq:3-management"
-    ports:
-      - "5672:5672" 
-      - "15672:15672"
-    networks:
-      - mutanetwork
+#   rabbitmq:
+#     image: "rabbitmq:3-management"
+#     ports:
+#       - "5672:5672" 
+#       - "15672:15672"
+#     networks:
+#       - mutanetwork
 
-  celery:
-    build:
-      context: ./
-    command: celery -A muta_event worker --loglevel=info
-    volumes:
-      - ./backend:/code
-    depends_on:
-      - rabbitmq
-      - db
-    networks:
-      - mutanetwork
+#   celery:
+#     build:
+#       context: ./
+#     command: celery -A muta_event worker --loglevel=info
+#     volumes:
+#       - ./backend:/code
+#     depends_on:
+#       - rabbitmq
+#       - db
+#     networks:
+#       - mutanetwork
 
-networks:
-  mutanetwork:
-    driver: bridge
+# networks:
+#   mutanetwork:
+#     driver: bridge
 
 # volumes:
   # db-data:

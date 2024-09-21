@@ -166,7 +166,7 @@ class UserSignup(APIView):
         }
 
         try:
-            send_verification_email_task.delay(email=user.email)
+            send_verification_email_task(email=user.email)
         except Exception as e:
             pass
 
@@ -191,7 +191,7 @@ class ForgetPassword(APIView):
             response.status_code = 500
             return response 
 
-        send_reset_email_task.delay(email=email, user_id=user.user_id)
+        send_reset_email_task(email=email, user_id=user.user_id)
         
         response.data = {"message":"Password reset link sent to your email if email exists"}
         response.status_code = 200
@@ -234,7 +234,7 @@ class GetVerificationLink(APIView):
         response = Response()
         email = request.data['email']
         try:
-            send_verification_email_task.delay(email,)
+            send_verification_email_task(email,)
         except Exception as e:
             response.data = {"message":"Email verification failed"}
             response.status_code = 500

@@ -80,7 +80,7 @@ def stripe_webhook_handler(request):
                     )
                     user_payment.save()
                     # send email to user 
-                    generate_pdf_and_send_mail.delay(
+                    generate_pdf_and_send_mail(
                         user_email=str(user.email),
                         payment_id=str(user_payment.payment_id),
                         user_first_name=str(user_payment.user.first_name),
@@ -119,7 +119,7 @@ def stripe_webhook_handler(request):
                         stripe_checkout_session_id = data['id'],
                     )
                     user_payment.save()
-                    generate_pdf_and_send_mail.delay(
+                    generate_pdf_and_send_mail(
                         user_email=str(user.email),
                         payment_id=str(user_payment.payment_id),
                         user_first_name=str(user_payment.user.first_name),

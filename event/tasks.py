@@ -1,10 +1,10 @@
 import os
 from django.core.mail import EmailMessage
 from django.conf import settings
-from celery import shared_task
+# from celery import shared_task
 from utils.generate_pdf import generate_pdf
 
-@shared_task
+# @shared_task
 def generate_pdf_and_send_mail(user_email, payment_id, user_first_name, user_last_name, payment_amount, payment_boolean, stripe_checkout_session_id, created_at):
     print('generating pdf....')
     file_path = generate_pdf(
