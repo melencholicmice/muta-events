@@ -166,4 +166,8 @@ def list_api(request):
         }
     ]
 
-    return JsonResponse(api_details)
+    return JsonResponse({
+        "message": "Hello from muta events, here you can make get info of all apis",
+        "Important" : " please note that this is just a testing deployment so some features might not work, to access complete applicatoin build from source :- https://github.com/melencholicmice/muta-events  ",
+        "api_details":api_details,   
+    },safe=False)
