@@ -3,6 +3,26 @@
 ## Overview
 MUTA EVENT is an event management and registration platform built using Django REST Framework and PostgreSQL.
 
+## Getting started
+
+- create an .env file of following format
+```
+STRIPE_PUBLISHABLE_KEY=''
+STRIPE_SECRET_KEY=''
+EMAIL_HOST_USER=''
+EMAIL_HOST_PASSWORD=''
+FRONTEND_URL=''
+STRIPE_ENDPOINT_SECRET=''
+GOOGLE_OAUTH2_CLIENT_ID=''
+GOOGLE_OAUTH2_CLIENT_SECRET=''
+GOOGLE_OAUTH2_PROJECT_ID=''
+BASE_BACKEND_URL=''
+RECAPTCHA_SITE_KEY = ''
+RECAPTCHA_SECRET_KEY = ''
+```
+
+- Then run `docker compose up --build`
+
 ## 1. User Management
 
 ### 1.1. User Login
